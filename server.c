@@ -12,6 +12,8 @@ void handleInput(char *input);
 
 int getOutput(char *output, size_t outputSize);
 
+long timeFromStart();
+
 long startTime;
 
 int main(int argc, char **argv)
