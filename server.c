@@ -77,9 +77,7 @@ void handleInput(char *input)
 	memset(displayName, '\0', sizeof displayName);
 	float touchX = NAN;
 	float touchY = NAN;
-  	struct timespec tt;
-  	clock_gettime(CLOCK_MONOTONIC, &tt);
-  	long touchTime = (tt.tv_sec + ((double)tt.tv_nsec)/1000000000L) * 1000 - startTime;
+  	long touchTime = timeFromStart();
 
 	char *ptr;
   	ptr = strtok(input, " ");
@@ -120,4 +118,11 @@ int getOutput(char *output, size_t outputSize)
 	int size = playersToString(output);
 
 	return size;
+}
+
+long timeFromStart()
+{
+  	struct timespec tt;
+  	clock_gettime(CLOCK_MONOTONIC, &tt);
+	return (tt.tv_sec + ((double)tt.tv_nsec)/1000000000L) * 1000 - startTime;
 }
