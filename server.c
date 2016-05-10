@@ -4,12 +4,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include "playerlist.h"
 
-void handleInput(char *input, size_t inputSize);
+void handleInput(char *input);
 
 int getOutput(char *output, size_t outputSize);
+
+long startTime;
 
 int main(int argc, char **argv)
 {
@@ -35,9 +38,13 @@ int main(int argc, char **argv)
 
   	addressSize = sizeof storage;
 
-  	printf("Server started on port %i\n", port);
-
 	srand(1); // Initialize random number generator
+
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	startTime = (ts.tv_sec + ts.tv_nsec/1000000000L) * 1000;
+
+  	printf("Server started on port %i\n", port);
 
   	// Receive any incoming packets
 	while (1)
@@ -51,7 +58,7 @@ int main(int argc, char **argv)
 
 		printf("Input: %s\nnumBytes = %i\n", buffer, numBytes);
 
-		handleInput(buffer, numBytes);
+		handleInput(buffer);
 
 		numBytes = getOutput(buffer, sizeof buffer);
 
@@ -64,42 +71,45 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-void handleInput(char *input, size_t inputSize)
+void handleInput(char *input)
 {
-	Player player = {"", NAN, NAN};
+	char displayName[16];
+	memset(displayName, '\0', sizeof displayName);
+	float touchX = NAN;
+	float touchY = NAN;
+  	struct timespec tt;
+  	clock_gettime(CLOCK_MONOTONIC, &tt);
+  	long touchTime = (tt.tv_sec + ((double)tt.tv_nsec)/1000000000L) * 1000 - startTime;
+
 	char *ptr;
   	ptr = strtok(input, " ");
   	while (ptr != NULL)
   	{
-  		if (strlen(player.displayName) == 0) {
-  			strcpy(player.displayName, ptr);
-  		} else if (isnan(player.x)) {
-  			if (strcmp(ptr, "null") == 0) {
-  				player.x = rand() % 100;
-  			} else {
-	  			player.x = atof(ptr);
-	  		}
-  		} else if (isnan(player.y)) {
-  			if (strcmp(ptr, "null") == 0) {
-  				player.y = rand() % 100;
-  			} else {
-	  			player.y = atof(ptr);
-	  		}
+  		if (strlen(displayName) == 0) {
+  			strcpy(displayName, ptr);
+  		} else if (isnan(touchX) && strcmp(ptr, "null") != 0) {
+  			touchX = atof(ptr);
+  		} else if (isnan(touchY) && strcmp(ptr, "null") != 0) {
+	  		touchY = atof(ptr);
   		}
     	ptr = strtok(NULL, " ");
   	}
-  	printf("Adding player: %s %f %f\n", player.displayName, player.x, player.y);
-  	if (countPlayers() == 0) {
-  		initPlayerList(player);
-  	} else {
-  		Player *foundPlayer = getPlayer(player.displayName);
-  		if (foundPlayer == NULL) {
-  			addPlayer(player);
-  		} else {
-  			*foundPlayer = player;
-  		}
+  	printf("Touch: %s %f %f %lu\n", displayName, touchX, touchY, touchTime);
+
+	Player *foundPlayer = getPlayer(displayName);
+  	if (foundPlayer == NULL) {
+  		Player newPlayer;
+  		strcpy(newPlayer.displayName, displayName);
+  		newPlayer.touchX = touchX;
+  		newPlayer.touchY = touchY;
+  		newPlayer.touchTime = touchTime;
+  		addPlayer(newPlayer);
+  	} else if (1) { // TODO if time is greater than max time?
+  		foundPlayer->touchX = touchX;
+  		foundPlayer->touchY = touchY;
+  		foundPlayer->touchTime = touchTime;
   	}
-  	printf("Printing player list:\n");
+
   	printPlayers();
 }
 

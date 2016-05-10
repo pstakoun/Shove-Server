@@ -22,6 +22,13 @@ int countPlayers()
 
 void addPlayer(Player player)
 {
+    printf("Adding player: %s %f %f %lu\n", player.displayName, player.touchX, player.touchY, player.touchTime);
+
+    if (countPlayers() == 0) {
+        initPlayerList(player);
+        return;
+    }
+
     Node *current = head;
     while (current->next != NULL) {
         current = current->next;
@@ -51,9 +58,9 @@ int playersToString(char *result)
     while (current != NULL) {
         sprintf(temp, "%s ", current->value.displayName);
         strcat(result, temp);
-        sprintf(temp, "%f ", current->value.x);
+        sprintf(temp, "%f ", current->value.touchX); // TODO calculate x value
         strcat(result, temp);
-        sprintf(temp, "%f ", current->value.y);
+        sprintf(temp, "%f ", current->value.touchY); // TODO calculate y value
         strcat(result, temp);
         current = current->next;
     }
@@ -62,9 +69,10 @@ int playersToString(char *result)
 
 void printPlayers()
 {
+    printf("Printing player list:\n");
     Node *current = head;
     while (current != NULL) {
-        printf("%s %f %f\n", current->value.displayName, current->value.x, current->value.y);
+        printf("%s %f %f %lu\n", current->value.displayName, current->value.touchX, current->value.touchY, current->value.touchTime);
         current = current->next;
     }
 }
