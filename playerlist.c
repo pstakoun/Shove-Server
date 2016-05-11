@@ -22,7 +22,7 @@ int countPlayers()
 
 void addPlayer(Player player)
 {
-    printf("Adding player: %s %f %f %lu\n", player.displayName, player.touchX, player.touchY, player.touchTime);
+    printf("Adding player: %s %f %f %f %f %lu\n", player.displayName, player.startX, player.startY, player.touchX, player.touchY, player.touchTime);
 
     if (countPlayers() == 0) {
         initPlayerList(player);
@@ -72,7 +72,7 @@ void printPlayers()
     printf("Printing player list:\n");
     Node *current = head;
     while (current != NULL) {
-        printf("%s %f %f %lu\n", current->value.displayName, current->value.touchX, current->value.touchY, current->value.touchTime);
+        printf("%s %f %f %f %f %lu\n", current->value.displayName, current->value.startX, current->value.startY, current->value.touchX, current->value.touchY, current->value.touchTime);
         current = current->next;
     }
 }
