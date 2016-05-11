@@ -88,25 +88,23 @@ void handleInput(char *input)
 			strcpy(displayName, ptr);
 		} else if (isnan(startX)) {
       if (strcmp(ptr, "null") == 0) {
-        // TODO assign random
+        startX = rand() % 100;
       } else {
         startX = atof(ptr);
       }
     } else if (isnan(startY)) {
       if (strcmp(ptr, "null") == 0) {
-        // TODO assign random
+        startY = rand() % 100;
       } else {
         startY = atof(ptr);
       }
     } else if (isnan(touchX)) {
       if (strcmp(ptr, "null") == 0) {
-        // TODO assign random
       } else {
         touchX = atof(ptr);
       }
     } else if (isnan(touchY)) {
       if (strcmp(ptr, "null") == 0) {
-        // TODO assign random
       } else {
         touchY = atof(ptr);
       }
