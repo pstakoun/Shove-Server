@@ -14,6 +14,8 @@ int getOutput(char *output, size_t outputSize);
 
 long timeFrom(struct timespec start);
 
+void updateLocation(Player *player);
+
 struct timespec startTime;
 
 int main(int argc, char **argv)
@@ -100,11 +102,13 @@ void handleInput(char *input)
       }
     } else if (isnan(touchX)) {
       if (strcmp(ptr, "null") == 0) {
+        touchX = startX;
       } else {
         touchX = atof(ptr);
       }
     } else if (isnan(touchY)) {
       if (strcmp(ptr, "null") == 0) {
+        touchY = startY;
       } else {
         touchY = atof(ptr);
       }
@@ -123,7 +127,7 @@ void handleInput(char *input)
 		newPlayer.touchY = touchY;
 		newPlayer.touchTime = touchTime;
 		addPlayer(newPlayer);
-	} else if (1) { // TODO if time is greater than max time?
+	} else if (touchTime - foundPlayer->touchTime > 5000) { // TODO if touch location reached
     foundPlayer->startX = startX;
     foundPlayer->startY = startY;
 		foundPlayer->touchX = touchX;
@@ -137,6 +141,8 @@ void handleInput(char *input)
 int getOutput(char *output, size_t outputSize)
 {
 	memset(output, '\0', outputSize);
+
+  updatePlayerLocations(timeFrom(startTime));
 
 	int size = playersToString(output);
 

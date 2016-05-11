@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "playerlist.h"
 
@@ -51,6 +52,17 @@ Player *getPlayer(char *displayName)
     return NULL;
 }
 
+void updatePlayerLocations(long currentTime)
+{
+    Node *current = head;
+    while (current != NULL) {
+        long timeDiff = currentTime - current->value.touchTime;
+        current->value.newX = rand() % 100;
+        current->value.newY = rand() % 100;
+        current = current->next;
+    }
+}
+
 int playersToString(char *result)
 {
 	Node *current = head;
@@ -58,10 +70,13 @@ int playersToString(char *result)
     while (current != NULL) {
         sprintf(temp, "%s ", current->value.displayName);
         strcat(result, temp);
-        sprintf(temp, "%f ", current->value.touchX); // TODO calculate x value
+        sprintf(temp, "%f ", current->value.newX);
         strcat(result, temp);
-        sprintf(temp, "%f ", current->value.touchY); // TODO calculate y value
+        sprintf(temp, "%f", current->value.newY);
         strcat(result, temp);
+        if (current->next != NULL) {
+            strcat(result, ",");
+        }
         current = current->next;
     }
     return strlen(result);

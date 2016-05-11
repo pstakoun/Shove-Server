@@ -15,6 +15,8 @@ void addPlayer(Player player);
 
 Player *getPlayer(char *displayName);
 
+void updatePlayerLocations();
+
 int playersToString(char *result);
 
 void printPlayers();
