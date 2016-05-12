@@ -64,7 +64,7 @@ void updatePlayerLocations(long currentTime)
         float y2 = current->value.touchY;
         float dist = getDistance(x1, x2, y1, y2);
         printf("%f\n", dist);
-        if (isnan(dist)) {
+        if (dist == 0) {
             current->value.newX = x1;
             current->value.newY = y1;
         } else {
@@ -106,8 +106,5 @@ void printPlayers()
 
 float getDistance(float x1, float x2, float y1, float y2)
 {
-    if ((x2 - x1) == 0 && (y2 - y1) == 0) {
-        return NAN;
-    }
     return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
