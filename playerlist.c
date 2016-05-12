@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "playerlist.h"
 
@@ -57,8 +58,19 @@ void updatePlayerLocations(long currentTime)
     Node *current = head;
     while (current != NULL) {
         long timeDiff = currentTime - current->value.touchTime;
-        current->value.newX = rand() % 100;
-        current->value.newY = rand() % 100;
+        float x1 = current->value.startX;
+        float x2 = current->value.touchX;
+        float y1 = current->value.startY;
+        float y2 = current->value.touchY;
+        float dist = getDistance(x1, x2, y1, y2);
+        printf("%f\n", dist);
+        if (isnan(dist)) {
+            current->value.newX = x1;
+            current->value.newY = y1;
+        } else {
+            current->value.newX = x1 + (x2 - x1) * (timeDiff / (dist * 10));
+            current->value.newY = y1 + (y2 - y1) * (timeDiff / (dist * 10));
+        }
         current = current->next;
     }
 }
@@ -90,4 +102,12 @@ void printPlayers()
         printf("%s %f %f %f %f %lu\n", current->value.displayName, current->value.startX, current->value.startY, current->value.touchX, current->value.touchY, current->value.touchTime);
         current = current->next;
     }
+}
+
+float getDistance(float x1, float x2, float y1, float y2)
+{
+    if ((x2 - x1) == 0 && (y2 - y1) == 0) {
+        return NAN;
+    }
+    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }

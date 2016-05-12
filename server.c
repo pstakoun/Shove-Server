@@ -127,9 +127,10 @@ void handleInput(char *input)
 		newPlayer.touchY = touchY;
 		newPlayer.touchTime = touchTime;
 		addPlayer(newPlayer);
-	} else if (touchTime - foundPlayer->touchTime > 5000) { // TODO if touch location reached
-    foundPlayer->startX = startX;
-    foundPlayer->startY = startY;
+	} else if ((startX == touchX && startY == touchY) ||
+    (touchTime - foundPlayer->touchTime) / (getDistance(startX, touchX, startY, touchY) * 10) > 1) {
+    foundPlayer->startX = foundPlayer->touchX;
+    foundPlayer->startY = foundPlayer->touchY;
 		foundPlayer->touchX = touchX;
 		foundPlayer->touchY = touchY;
 		foundPlayer->touchTime = touchTime;

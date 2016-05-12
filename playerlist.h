@@ -20,3 +20,5 @@ void updatePlayerLocations();
 int playersToString(char *result);
 
 void printPlayers();
+
+float getDistance(float x1, float x2, float y1, float y2);
