@@ -1,11 +1,10 @@
+#include "location.h"
+
 typedef struct Players
 {
 	char displayName[16];
-	float startX;
-	float startY;
-	float newX;
-	float newY;
-	float touchX;
-	float touchY;
+	Location start;
+	Location touch;
+	Location current;
 	long touchTime;
 } Player;

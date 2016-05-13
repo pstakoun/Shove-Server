@@ -14,7 +14,7 @@ int getOutput(char *output, size_t outputSize);
 
 long timeFrom(struct timespec start);
 
-void updateLocation(Player *player);
+void updateLocation(Player *Player);
 
 struct timespec startTime;
 
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
 		numBytes = getOutput(buffer, sizeof buffer);
 
-		printf("Output: %s\nnumBytes = %i\n", buffer, numBytes);
+		printf("Output: %s\nnumB.ytes = %i\n", buffer, numBytes);
 
 		// Send packet to client
 		sendto(udpSocket, buffer, numBytes, 0, (struct sockaddr *) &storage, addressSize);
@@ -76,10 +76,8 @@ void handleInput(char *input)
 {
   char displayName[16];
 	memset(displayName, '\0', sizeof displayName);
-  float startX = NAN;
-  float startY = NAN;
-	float touchX = NAN;
-	float touchY = NAN;
+  Location start = { NAN, NAN };
+  Location touch = { NAN, NAN };
   long touchTime = timeFrom(startTime);
 
 	char *ptr;
@@ -88,51 +86,51 @@ void handleInput(char *input)
 	{
 		if (strlen(displayName) == 0) {
 			strcpy(displayName, ptr);
-		} else if (isnan(startX)) {
+		} else if (isnan(start.x)) {
       if (strcmp(ptr, "null") == 0) {
-        startX = rand() % 100;
+        start.x = rand() % 100;
       } else {
-        startX = atof(ptr);
+        start.x = atof(ptr);
       }
-    } else if (isnan(startY)) {
+    } else if (isnan(start.y)) {
       if (strcmp(ptr, "null") == 0) {
-        startY = rand() % 100;
+        start.y = rand() % 100;
       } else {
-        startY = atof(ptr);
+        start.y = atof(ptr);
       }
-    } else if (isnan(touchX)) {
+    } else if (isnan(touch.x)) {
       if (strcmp(ptr, "null") == 0) {
-        touchX = startX;
+        touch.x = start.x;
       } else {
-        touchX = atof(ptr);
+        touch.x = atof(ptr);
       }
-    } else if (isnan(touchY)) {
+    } else if (isnan(touch.y)) {
       if (strcmp(ptr, "null") == 0) {
-        touchY = startY;
+        touch.y = start.y;
       } else {
-        touchY = atof(ptr);
+        touch.y = atof(ptr);
       }
     }
   	ptr = strtok(NULL, " ");
 	}
-	printf("Touch: %s %f %f %f %f %lu\n", displayName, startX, startY, touchX, touchY, touchTime);
+	printf("Touch: %s %f %f %f %f %lu\n", displayName, start.x, start.y, touch.x, touch.y, touchTime);
 
 	Player *foundPlayer = getPlayer(displayName);
 	if (foundPlayer == NULL) {
 		Player newPlayer;
 		strcpy(newPlayer.displayName, displayName);
-    newPlayer.startX = startX;
-    newPlayer.startY = startY;
-		newPlayer.touchX = touchX;
-		newPlayer.touchY = touchY;
+    newPlayer.start.x = start.x;
+    newPlayer.start.y = start.y;
+		newPlayer.touch.x = touch.x;
+		newPlayer.touch.y = touch.y;
 		newPlayer.touchTime = touchTime;
 		addPlayer(newPlayer);
-	} else if ((startX == touchX && startY == touchY) ||
-    (touchTime - foundPlayer->touchTime) / (getDistance(startX, touchX, startY, touchY) * 10) > 1) {
-    foundPlayer->startX = foundPlayer->touchX;
-    foundPlayer->startY = foundPlayer->touchY;
-		foundPlayer->touchX = touchX;
-		foundPlayer->touchY = touchY;
+	} else if ((start.x == touch.x && start.y == touch.y) ||
+    (touchTime - foundPlayer->touchTime) / (getDistance(start.x, touch.x, start.y, touch.y) * 10) > 1) {
+    foundPlayer->start.x = foundPlayer->touch.x;
+    foundPlayer->start.y = foundPlayer->touch.y;
+		foundPlayer->touch.x = touch.x;
+		foundPlayer->touch.y = touch.y;
 		foundPlayer->touchTime = touchTime;
 	}
 
