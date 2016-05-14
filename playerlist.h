@@ -2,7 +2,7 @@
 
 typedef struct node {
 	Player value;
-  	struct node *next;
+	struct node *next;
 } Node;
 
 Node *head;
