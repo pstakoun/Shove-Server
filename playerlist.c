@@ -58,21 +58,28 @@ void updatePlayerLocations(long currentTime)
 	Node *current = head;
 	while (current != NULL) {
 		long timeDiff = currentTime - current->value.touchTime;
-		float x1 = current->value.start.x;
-		float x2 = current->value.touch.x;
-		float y1 = current->value.start.y;
-		float y2 = current->value.touch.y;
-		float dist = getDistance(x1, x2, y1, y2);
-		printf("%f\n", dist);
+		float dist = getDistance(current->value.start, current->value.touch);
 		if (dist == 0) {
-			current->value.current.x = x1;
-			current->value.current.y = y1;
+			current->value.current = current->value.start;
 		} else {
-			current->value.current.x = x1 + (x2 - x1) * (timeDiff / (dist * 10));
-			current->value.current.y = y1 + (y2 - y1) * (timeDiff / (dist * 10));
+			current->value.current.x = current->value.start.x + (current->value.touch.x - current->value.start.x) * (timeDiff / (dist * 10));
+			current->value.current.y = current->value.start.y + (current->value.touch.y - current->value.start.y) * (timeDiff / (dist * 10));
+		}
+		Node *other = head;
+		while (other != NULL) {
+			if (current->value.displayName != other->value.displayName &&
+			getDistance(current->value.current, other->value.current) < 20) {
+				handleCollision(&(current->value), &(other->value));
+			}
+			other = other->next;
 		}
 		current = current->next;
 	}
+}
+
+void handleCollision(Player *p1, Player *p2)
+{
+	printf("Collision: %s %s\n", p1->displayName, p2->displayName);
 }
 
 int playersToString(char *result)
@@ -104,7 +111,7 @@ void printPlayers()
 	}
 }
 
-float getDistance(float x1, float x2, float y1, float y2)
+float getDistance(Location loc1, Location loc2)
 {
-	return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	return sqrt((loc2.x - loc1.x) * (loc2.x - loc1.x) + (loc2.y - loc1.y) * (loc2.y - loc1.y));
 }

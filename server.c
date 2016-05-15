@@ -16,6 +16,9 @@ long timeFrom(struct timespec start);
 
 void updateLocation(Player *Player);
 
+const int GAME_SIZE = 500;
+const int PLAYER_SIZE = 10;
+
 struct timespec startTime;
 
 int main(int argc, char **argv)
@@ -56,7 +59,7 @@ int main(int argc, char **argv)
 		memset(buffer, '\0', sizeof buffer);
 
 		// Get packet from client
-		int numBytes = recvfrom(udpSocket, buffer, 1024, 0, (struct sockaddr *) &storage, &addressSize);
+		int numBytes = recvfrom(udpSocket, buffer, sizeof buffer, 0, (struct sockaddr *) &storage, &addressSize);
 
 		printf("Input: %s\nnumBytes = %i\n", buffer, numBytes);
 
@@ -89,13 +92,13 @@ void handleInput(char *input)
 			strcpy(displayName, ptr);
 		} else if (isnan(start.x)) {
 			if (strcmp(ptr, "null") == 0) {
-				start.x = rand() % 500;
+				start.x = rand() % GAME_SIZE;
 			} else {
 				start.x = atof(ptr);
 			}
 		} else if (isnan(start.y)) {
 			if (strcmp(ptr, "null") == 0) {
-				start.y = rand() % 500;
+				start.y = rand() % GAME_SIZE;
 			} else {
 				start.y = atof(ptr);
 			}
@@ -120,18 +123,14 @@ void handleInput(char *input)
 	if (foundPlayer == NULL) {
 		Player newPlayer;
 		strcpy(newPlayer.displayName, displayName);
-		newPlayer.start.x = start.x;
-		newPlayer.start.y = start.y;
-		newPlayer.touch.x = touch.x;
-		newPlayer.touch.y = touch.y;
+		newPlayer.start = start;
+		newPlayer.touch = touch;
 		newPlayer.touchTime = touchTime;
 		addPlayer(newPlayer);
-	} else if (abs(foundPlayer->current.x - foundPlayer->touch.x) < 10 &&
-	abs(foundPlayer->current.y - foundPlayer->touch.y) < 10) {
-		foundPlayer->start.x = foundPlayer->touch.x;
-		foundPlayer->start.y = foundPlayer->touch.y;
-		foundPlayer->touch.x = touch.x;
-		foundPlayer->touch.y = touch.y;
+	} else if (abs(foundPlayer->current.x - foundPlayer->touch.x) < PLAYER_SIZE &&
+	abs(foundPlayer->current.y - foundPlayer->touch.y) < PLAYER_SIZE) {
+		foundPlayer->start = foundPlayer->touch;
+		foundPlayer->touch = touch;
 		foundPlayer->touchTime = touchTime;
 	}
 	

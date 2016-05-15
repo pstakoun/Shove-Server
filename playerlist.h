@@ -17,8 +17,10 @@ Player *getPlayer(char *displayName);
 
 void updatePlayerLocations();
 
+void handleCollision(Player *p1, Player *p2);
+
 int playersToString(char *result);
 
 void printPlayers();
 
-float getDistance(float x1, float x2, float y1, float y2);
+float getDistance(Location loc1, Location loc2);
