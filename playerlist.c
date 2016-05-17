@@ -4,6 +4,8 @@
 
 #include "playerlist.h"
 
+const float SPEED = 5f;
+
 void initPlayerList(Player player)
 {
 	head = malloc(sizeof(Node));
@@ -24,7 +26,7 @@ int countPlayers()
 
 void addPlayer(Player player)
 {
-	printf("Adding player: %s %f %f %f %f %lu\n", player.displayName, player.start.x, player.start.y, player.touch.x, player.touch.y, player.touchTime);
+	printf("Adding player: %s %f %f %f %f %lu\n", player.displayName, player.location.x, player.location.y, player.touch.x, player.touch.y, player.touchTime);
 
 	if (countPlayers() == 0) {
 		initPlayerList(player);
@@ -58,17 +60,16 @@ void updatePlayerLocations(long currentTime)
 	Node *current = head;
 	while (current != NULL) {
 		long timeDiff = currentTime - current->value.touchTime;
-		float dist = getDistance(current->value.start, current->value.touch);
-		if (dist == 0) {
-			current->value.current = current->value.start;
-		} else {
-			current->value.current.x = current->value.start.x + (current->value.touch.x - current->value.start.x) * (timeDiff / (dist * 10));
-			current->value.current.y = current->value.start.y + (current->value.touch.y - current->value.start.y) * (timeDiff / (dist * 10));
+		// TODO remove if timeDiff too big
+		float dist = getDistance(current->value.location, current->value.touch);
+		if (dist >= SPEED) {
+			current->value.location.x = current->value.location.x + SPEED * (current->value.touch.x - current->value.location.x) * (timeDiff + 1) / dist;
+			current->value.location.y = current->value.location.y + SPEED * (current->value.touch.y - current->value.location.y) * (timeDiff + 1) / dist;
 		}
 		Node *other = head;
 		while (other != NULL) {
 			if (current->value.displayName != other->value.displayName &&
-			getDistance(current->value.current, other->value.current) < 20) {
+			getDistance(current->value.location, other->value.location) < 20) {
 				handleCollision(&(current->value), &(other->value));
 			}
 			other = other->next;
@@ -89,9 +90,9 @@ int playersToString(char *result)
 	while (current != NULL) {
 		sprintf(temp, "%s ", current->value.displayName);
 		strcat(result, temp);
-		sprintf(temp, "%f ", current->value.current.x);
+		sprintf(temp, "%f ", current->value.location.x);
 		strcat(result, temp);
-		sprintf(temp, "%f", current->value.current.y);
+		sprintf(temp, "%f", current->value.location.y);
 		strcat(result, temp);
 		if (current->next != NULL) {
 			strcat(result, ",");
@@ -106,7 +107,7 @@ void printPlayers()
 	printf("Printing player list:\n");
 	Node *current = head;
 	while (current != NULL) {
-		printf("%s %f %f %f %f %lu\n", current->value.displayName, current->value.start.x, current->value.start.y, current->value.touch.x, current->value.touch.y, current->value.touchTime);
+		printf("%s %f %f %f %f %lu\n", current->value.displayName, current->value.location.x, current->value.location.y, current->value.touch.x, current->value.touch.y, current->value.touchTime);
 		current = current->next;
 	}
 }

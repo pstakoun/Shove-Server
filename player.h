@@ -1,10 +1,11 @@
+#include <sys/socket.h>
+
 #include "location.h"
 
 typedef struct Players
 {
 	char displayName[16];
-	Location start;
+	Location location;
 	Location touch;
-	Location current;
 	long touchTime;
 } Player;
