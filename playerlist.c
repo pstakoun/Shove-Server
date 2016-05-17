@@ -4,7 +4,7 @@
 
 #include "playerlist.h"
 
-const float SPEED = 5f;
+const float SPEED = 5.0f;
 
 void initPlayerList(Player player)
 {
