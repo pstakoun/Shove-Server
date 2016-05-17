@@ -80,8 +80,8 @@ void handleInput(char *input)
 {
 	char displayName[16];
 	memset(displayName, '\0', sizeof displayName);
-	Location start = { NAN, NAN };
 	Location touch = { NAN, NAN };
+	int touched = 1;
 	long touchTime = timeFrom(startTime);
 
 	char *ptr;
@@ -90,48 +90,48 @@ void handleInput(char *input)
 	{
 		if (strlen(displayName) == 0) {
 			strcpy(displayName, ptr);
-		} else if (isnan(start.x)) {
-			if (strcmp(ptr, "null") == 0) {
-				start.x = rand() % GAME_SIZE;
-			} else {
-				start.x = atof(ptr);
-			}
-		} else if (isnan(start.y)) {
-			if (strcmp(ptr, "null") == 0) {
-				start.y = rand() % GAME_SIZE;
-			} else {
-				start.y = atof(ptr);
-			}
 		} else if (isnan(touch.x)) {
 			if (strcmp(ptr, "null") == 0) {
-				touch.x = start.x;
+				touch.x = 0;
+				touched = 0;
+				break;
 			} else {
 				touch.x = atof(ptr);
 			}
 		} else if (isnan(touch.y)) {
 			if (strcmp(ptr, "null") == 0) {
-				touch.y = start.y;
+				touch.y = 0;
+				touched = 0;
 			} else {
 				touch.y = atof(ptr);
 			}
+			break;
 		}
 		ptr = strtok(NULL, " ");
 	}
-	printf("Touch: %s %f %f %f %f %lu\n", displayName, start.x, start.y, touch.x, touch.y, touchTime);
-	
+
+	printf("Touch: %s %f %f %lu\n", displayName, touch.x, touch.y, touchTime);
+
 	Player *foundPlayer = getPlayer(displayName);
 	if (foundPlayer == NULL) {
 		Player newPlayer;
 		strcpy(newPlayer.displayName, displayName);
-		newPlayer.start = start;
-		newPlayer.touch = touch;
+		Location newLocation = { rand() % GAME_SIZE, rand() % GAME_SIZE };
+		newPlayer.location = newLocation;
+		if (touched) {
+			newPlayer.touch = touch;
+		} else {
+			newPlayer.touch = newLocation;
+		}
 		newPlayer.touchTime = touchTime;
 		addPlayer(newPlayer);
-	} else if (abs(foundPlayer->current.x - foundPlayer->touch.x) < PLAYER_SIZE &&
-	abs(foundPlayer->current.y - foundPlayer->touch.y) < PLAYER_SIZE) {
-		foundPlayer->start = foundPlayer->touch;
-		foundPlayer->touch = touch;
+	} else {
 		foundPlayer->touchTime = touchTime;
+		if (touched) {
+			foundPlayer->touch = touch;
+		} else {
+			foundPlayer->touch = foundPlayer->location;
+		}
 	}
 	
 	printPlayers();
