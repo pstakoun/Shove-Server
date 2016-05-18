@@ -8,8 +8,6 @@
 
 #include "server.h"
 
-const int GAME_SIZE = 500;
-
 struct timespec startTime;
 
 int main(int argc, char **argv)
@@ -36,7 +34,7 @@ int main(int argc, char **argv)
 
 	addressSize = sizeof storage;
 
-	srand(1); // Initialize random number generator
+	srand(time(NULL)); // Initialize random number generator
 
 	clock_gettime(CLOCK_MONOTONIC, &startTime);
 
@@ -119,6 +117,14 @@ void handleInput(char *input)
 		Location emptyLocation = { NAN, NAN };
 		newPlayer.collisionTarget = emptyLocation;
 		newPlayer.collisionTime = NAN;
+		// Assign random color to player
+		int tempColor = rand() % NUM_COLORS;
+		newPlayer.color = (tempColor + 1) % NUM_COLORS;
+		while (usedColors[newPlayer.color] && newPlayer.color != tempColor) {
+			newPlayer.color = (newPlayer.color + 1) % NUM_COLORS;
+		}
+		usedColors[newPlayer.color] = 1;
+		// Add player to linked list
 		addPlayer(newPlayer);
 	} else {
 		foundPlayer->touchTime = touchTime;

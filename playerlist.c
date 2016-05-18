@@ -2,12 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "playerlist.h"
-
-const int PLAYER_RADIUS = 15;
-const float SPEED = 15.0f;
-const float COLLISION_DISTANCE = 100.0f;
-const long MOVE_DELAY = 100l;
+#include "server.h"
 
 void initPlayerList(Player player)
 {
@@ -53,6 +48,7 @@ void removePlayer(Player player)
 
 	while(current != NULL) {
 		if (strcmp(player.displayName, current->value.displayName) == 0) {
+			usedColors[current->value.color] = 0;
 			if (current == head) {
 				head = head->next;
 			} else {
@@ -146,7 +142,9 @@ int playersToString(char *result)
 		strcat(result, temp);
 		sprintf(temp, "%f ", current->value.location.x);
 		strcat(result, temp);
-		sprintf(temp, "%f", current->value.location.y);
+		sprintf(temp, "%f ", current->value.location.y);
+		strcat(result, temp);
+		sprintf(temp, "%i", current->value.color);
 		strcat(result, temp);
 		if (current->next != NULL) {
 			strcat(result, ",");

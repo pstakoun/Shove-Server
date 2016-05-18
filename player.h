@@ -11,4 +11,5 @@ typedef struct Players
 	long lastMoveTime;
 	Location collisionTarget;
 	long collisionTime;
+	int color;
 } Player;
