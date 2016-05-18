@@ -116,6 +116,9 @@ void handleInput(char *input)
 		}
 		newPlayer.touchTime = touchTime;
 		newPlayer.lastMoveTime = 0;
+		Location emptyLocation = { NAN, NAN };
+		newPlayer.collisionTarget = emptyLocation;
+		newPlayer.collisionTime = NAN;
 		addPlayer(newPlayer);
 	} else {
 		foundPlayer->touchTime = touchTime;
