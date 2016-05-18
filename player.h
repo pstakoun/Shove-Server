@@ -8,4 +8,5 @@ typedef struct Players
 	Location location;
 	Location touch;
 	long touchTime;
+	long lastMoveTime;
 } Player;

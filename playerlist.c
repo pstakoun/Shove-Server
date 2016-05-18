@@ -4,7 +4,9 @@
 
 #include "playerlist.h"
 
-const float SPEED = 5.0f;
+const int PLAYER_RADIUS = 15;
+const float SPEED = 10.0f;
+const long MOVE_DELAY = 50l;
 
 void initPlayerList(Player player)
 {
@@ -43,6 +45,26 @@ void addPlayer(Player player)
 	current->next->next = NULL;
 }
 
+void removePlayer(Player player)
+{
+	Node *current = head;
+	Node *previous = NULL;
+
+	while(current != NULL) {
+		if (strcmp(player.displayName, current->value.displayName) == 0) {
+			if (current == head) {
+				head = head->next;
+			} else {
+				previous->next = current->next;
+			}
+			free(current);
+			break;
+		}
+		previous = current;
+		current = current->next;
+	}
+}
+
 Player *getPlayer(char *displayName)
 {
 	Node *current = head;
@@ -59,17 +81,24 @@ void updatePlayerLocations(long currentTime)
 {
 	Node *current = head;
 	while (current != NULL) {
-		long timeDiff = currentTime - current->value.touchTime;
-		// TODO remove if timeDiff too big
+		if (currentTime - current->value.touchTime > 500) {
+			removePlayer(current->value);
+		}
+		current = current->next;
+	}
+
+	current = head;
+	while (current != NULL) {
 		float dist = getDistance(current->value.location, current->value.touch);
-		if (dist >= SPEED) {
-			current->value.location.x = current->value.location.x + SPEED * (current->value.touch.x - current->value.location.x) * (timeDiff + 1) / dist;
-			current->value.location.y = current->value.location.y + SPEED * (current->value.touch.y - current->value.location.y) * (timeDiff + 1) / dist;
+		if (dist >= SPEED && currentTime - current->value.lastMoveTime > MOVE_DELAY) {
+			current->value.location.x = current->value.location.x + SPEED * (current->value.touch.x - current->value.location.x) / dist;
+			current->value.location.y = current->value.location.y + SPEED * (current->value.touch.y - current->value.location.y) / dist;
+			current->value.lastMoveTime = currentTime;
 		}
 		Node *other = head;
 		while (other != NULL) {
 			if (current->value.displayName != other->value.displayName &&
-			getDistance(current->value.location, other->value.location) < 20) {
+			getDistance(current->value.location, other->value.location) < PLAYER_RADIUS * 2) {
 				handleCollision(&(current->value), &(other->value));
 			}
 			other = other->next;

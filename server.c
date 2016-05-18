@@ -6,18 +6,9 @@
 #include <math.h>
 #include <time.h>
 
-#include "playerlist.h"
-
-void handleInput(char *input);
-
-int getOutput(char *output, size_t outputSize);
-
-long timeFrom(struct timespec start);
-
-void updateLocation(Player *Player);
+#include "server.h"
 
 const int GAME_SIZE = 500;
-const int PLAYER_SIZE = 10;
 
 struct timespec startTime;
 
@@ -124,6 +115,7 @@ void handleInput(char *input)
 			newPlayer.touch = newLocation;
 		}
 		newPlayer.touchTime = touchTime;
+		newPlayer.lastMoveTime = 0;
 		addPlayer(newPlayer);
 	} else {
 		foundPlayer->touchTime = touchTime;

@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -lm -I.
-DEPS = location.h player.h playerlist.h
-OBJ = server.o playerlist.o 
+DEPS = location.h player.h playerlist.h server.h
+OBJ = server.o playerlist.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
