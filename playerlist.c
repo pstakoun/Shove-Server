@@ -78,7 +78,7 @@ void updatePlayerLocations(long currentTime)
 {
 	Node *current = head;
 	while (current != NULL) {
-		if (currentTime - current->value.touchTime > 500) {
+		if (currentTime - current->value.touchTime > 1000) {
 			removePlayer(current->value);
 		}
 		current = current->next;
@@ -89,7 +89,7 @@ void updatePlayerLocations(long currentTime)
 		float dist;
 		if (!isnan(current->value.collisionTarget.x) && !isnan(current->value.collisionTarget.y)) {
 			dist = getDistance(current->value.location, current->value.collisionTarget);
-			if (dist < SPEED * 1.5) {
+			if (dist < SPEED * 3) {
 				current->value.collisionTarget.x = NAN;
 				current->value.collisionTarget.y = NAN;
 				current->value.collisionTime = NAN;
@@ -111,7 +111,7 @@ void updatePlayerLocations(long currentTime)
 		while (other != NULL) {
 			if (current->value.displayName != other->value.displayName &&
 			getDistance(current->value.location, other->value.location) < PLAYER_RADIUS * 2 &&
-			!isnan(current->value.collisionTime) && currentTime - current->value.collisionTime > MOVE_DELAY * 2) {
+			(isnan(current->value.collisionTime) || (!isnan(current->value.collisionTime) && currentTime - current->value.collisionTime > MOVE_DELAY * 2))) {
 				handleCollision(&(current->value), &(other->value));
 				current->value.collisionTime = currentTime;
 				other->value.collisionTime = currentTime;
@@ -125,12 +125,30 @@ void updatePlayerLocations(long currentTime)
 void handleCollision(Player *p1, Player *p2)
 {
 	printf("Collision: %s %s\n", p1->displayName, p2->displayName);
-	float p1CollisionDist = getDistance(p1->location, p2->touch);
-	float p2CollisionDist = getDistance(p2->location, p1->touch);
-	p1->collisionTarget.x = p1->location.x + COLLISION_DISTANCE * (p2->touch.x - p1->location.x) / p1CollisionDist;
-	p1->collisionTarget.y = p1->location.y + COLLISION_DISTANCE * (p2->touch.y - p1->location.y) / p1CollisionDist;
-	p2->collisionTarget.x = p2->location.x + COLLISION_DISTANCE * (p1->touch.x - p2->location.x) / p2CollisionDist;
-	p2->collisionTarget.y = p2->location.y + COLLISION_DISTANCE * (p1->touch.y - p2->location.y) / p2CollisionDist;
+	float p1CollisionDist;
+	float p2CollisionDist;
+	if (p2->touch.x != p2->location.x && p2->touch.y != p2->location.y) {
+		p1CollisionDist = getDistance(p1->location, p2->touch);
+		p1->collisionTarget.x = p1->location.x + COLLISION_DISTANCE * (p2->touch.x - p1->location.x) / p1CollisionDist;
+		p1->collisionTarget.y = p1->location.y + COLLISION_DISTANCE * (p2->touch.y - p1->location.y) / p1CollisionDist;
+		printf("a\n");
+	} else if (!isnan(p2->collisionTarget.x) && !isnan(p2->collisionTarget.y)) {
+		p1CollisionDist = getDistance(p1->location, p2->collisionTarget);
+		p1->collisionTarget.x = p1->location.x + COLLISION_DISTANCE * (p2->collisionTarget.x - p1->location.x) / p1CollisionDist;
+		p1->collisionTarget.y = p1->location.y + COLLISION_DISTANCE * (p2->collisionTarget.y - p1->location.y) / p1CollisionDist;
+		printf("b\n");
+	}
+	if (p1->touch.x != p1->location.x && p1->touch.y != p1->location.y) {
+		p2CollisionDist = getDistance(p2->location, p1->touch);
+		p2->collisionTarget.x = p2->location.x + COLLISION_DISTANCE * (p1->touch.x - p2->location.x) / p2CollisionDist;
+		p2->collisionTarget.y = p2->location.y + COLLISION_DISTANCE * (p1->touch.y - p2->location.y) / p2CollisionDist;
+		printf("c\n");
+	} else if (!isnan(p1->collisionTarget.x) && !isnan(p1->collisionTarget.y)) {
+		p2CollisionDist = getDistance(p2->location, p1->collisionTarget);
+		p2->collisionTarget.x = p2->location.x + COLLISION_DISTANCE * (p1->collisionTarget.x - p2->location.x) / p2CollisionDist;
+		p2->collisionTarget.y = p2->location.y + COLLISION_DISTANCE * (p1->collisionTarget.y - p2->location.y) / p2CollisionDist;
+		printf("d\n");
+	}
 }
 
 int playersToString(char *result)
