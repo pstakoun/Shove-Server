@@ -106,6 +106,11 @@ void handleInput(char *input)
 		Player newPlayer;
 		strcpy(newPlayer.displayName, displayName);
 		Location newLocation = { rand() % GAME_SIZE, rand() % GAME_SIZE };
+		Location center = { GAME_SIZE / 2, GAME_SIZE / 2 };
+		while (getDistance(newLocation, center) > GAME_SIZE / 2) {
+			newLocation.x = rand() % GAME_SIZE;
+			newLocation.y = rand() % GAME_SIZE;
+		}
 		newPlayer.location = newLocation;
 		if (touched) {
 			newPlayer.touch = touch;
