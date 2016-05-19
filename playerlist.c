@@ -94,8 +94,8 @@ void updatePlayerLocations(long currentTime)
 				current->value.collisionTarget.y = NAN;
 				current->value.collisionTime = NAN;
 			} else if (currentTime - current->value.lastMoveTime > MOVE_DELAY) {
-				current->value.location.x = current->value.location.x + SPEED * 3 * (current->value.collisionTarget.x - current->value.location.x) / dist;
-				current->value.location.y = current->value.location.y + SPEED * 3 * (current->value.collisionTarget.y - current->value.location.y) / dist;
+				current->value.location.x = current->value.location.x + SPEED * 2.5f * (current->value.collisionTarget.x - current->value.location.x) / dist;
+				current->value.location.y = current->value.location.y + SPEED * 2.5f * (current->value.collisionTarget.y - current->value.location.y) / dist;
 				current->value.lastMoveTime = currentTime;
 			}
 		} else {
@@ -111,7 +111,7 @@ void updatePlayerLocations(long currentTime)
 		while (other != NULL) {
 			if (current->value.displayName != other->value.displayName &&
 			getDistance(current->value.location, other->value.location) < PLAYER_RADIUS * 2 &&
-			(isnan(current->value.collisionTime) || (!isnan(current->value.collisionTime) && currentTime - current->value.collisionTime > MOVE_DELAY * 2))) {
+			(isnan(current->value.collisionTime) || (!isnan(current->value.collisionTime) && currentTime - current->value.collisionTime > MOVE_DELAY / 3.0f))) {
 				handleCollision(&(current->value), &(other->value));
 				current->value.collisionTime = currentTime;
 				other->value.collisionTime = currentTime;
