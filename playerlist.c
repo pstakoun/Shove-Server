@@ -131,23 +131,19 @@ void handleCollision(Player *p1, Player *p2)
 		p1CollisionDist = getDistance(p1->location, p2->touch);
 		p1->collisionTarget.x = p1->location.x + COLLISION_DISTANCE * (p2->touch.x - p1->location.x) / p1CollisionDist;
 		p1->collisionTarget.y = p1->location.y + COLLISION_DISTANCE * (p2->touch.y - p1->location.y) / p1CollisionDist;
-		printf("a\n");
 	} else if (!isnan(p2->collisionTarget.x) && !isnan(p2->collisionTarget.y)) {
 		p1CollisionDist = getDistance(p1->location, p2->collisionTarget);
 		p1->collisionTarget.x = p1->location.x + COLLISION_DISTANCE * (p2->collisionTarget.x - p1->location.x) / p1CollisionDist;
 		p1->collisionTarget.y = p1->location.y + COLLISION_DISTANCE * (p2->collisionTarget.y - p1->location.y) / p1CollisionDist;
-		printf("b\n");
 	}
 	if (p1->touch.x != p1->location.x && p1->touch.y != p1->location.y) {
 		p2CollisionDist = getDistance(p2->location, p1->touch);
 		p2->collisionTarget.x = p2->location.x + COLLISION_DISTANCE * (p1->touch.x - p2->location.x) / p2CollisionDist;
 		p2->collisionTarget.y = p2->location.y + COLLISION_DISTANCE * (p1->touch.y - p2->location.y) / p2CollisionDist;
-		printf("c\n");
 	} else if (!isnan(p1->collisionTarget.x) && !isnan(p1->collisionTarget.y)) {
 		p2CollisionDist = getDistance(p2->location, p1->collisionTarget);
 		p2->collisionTarget.x = p2->location.x + COLLISION_DISTANCE * (p1->collisionTarget.x - p2->location.x) / p2CollisionDist;
 		p2->collisionTarget.y = p2->location.y + COLLISION_DISTANCE * (p1->collisionTarget.y - p2->location.y) / p2CollisionDist;
-		printf("d\n");
 	}
 }
 
