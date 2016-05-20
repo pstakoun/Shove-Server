@@ -11,6 +11,8 @@ void initPlayerList(Player player);
 
 int countPlayers();
 
+void resetPlayer(Player *player, long currentTime);
+
 void addPlayer(Player player);
 
 void removePlayer(Player player);
@@ -24,5 +26,7 @@ void handleCollision(Player *p1, Player *p2);
 int playersToString(char *result);
 
 void printPlayers();
+
+Location randomLocation();
 
 float getDistance(Location loc1, Location loc2);

@@ -22,6 +22,17 @@ int countPlayers()
 	return count;
 }
 
+void resetPlayer(Player *player, long currentTime)
+{
+	player->location = randomLocation();
+	player->touch = player->location;
+	player->touchTime = currentTime;
+	player->lastMoveTime = 0;
+	Location emptyLocation = { NAN, NAN };
+	player->collisionTarget = emptyLocation;
+	player->collisionTime = NAN;
+}
+
 void addPlayer(Player player)
 {
 	printf("Adding player: %s %f %f %f %f %lu\n", player.displayName, player.location.x, player.location.y, player.touch.x, player.touch.y, player.touchTime);
@@ -80,6 +91,8 @@ void updatePlayerLocations(long currentTime)
 	while (current != NULL) {
 		if (currentTime - current->value.touchTime > 1000) {
 			removePlayer(current->value);
+		} else if (getDistance(current->value.location, center) > GAME_SIZE / 2 + PLAYER_RADIUS) {
+			resetPlayer(&(current->value), currentTime);
 		}
 		current = current->next;
 	}
@@ -111,7 +124,7 @@ void updatePlayerLocations(long currentTime)
 		while (other != NULL) {
 			if (current->value.displayName != other->value.displayName &&
 			getDistance(current->value.location, other->value.location) < PLAYER_RADIUS * 2 &&
-			(isnan(current->value.collisionTime) || (!isnan(current->value.collisionTime) && currentTime - current->value.collisionTime > MOVE_DELAY / 3.0f))) {
+			(isnan(current->value.collisionTime) || (!isnan(current->value.collisionTime) && currentTime - current->value.collisionTime > MOVE_DELAY * 3))) {
 				handleCollision(&(current->value), &(other->value));
 				current->value.collisionTime = currentTime;
 				other->value.collisionTime = currentTime;
@@ -176,6 +189,16 @@ void printPlayers()
 		printf("%s %f %f %f %f %lu\n", current->value.displayName, current->value.location.x, current->value.location.y, current->value.touch.x, current->value.touch.y, current->value.touchTime);
 		current = current->next;
 	}
+}
+
+Location randomLocation()
+{
+	Location newLocation = { rand() % GAME_SIZE, rand() % GAME_SIZE };
+	while (getDistance(newLocation, center) > GAME_SIZE / 2) {
+		newLocation.x = rand() % GAME_SIZE;
+		newLocation.y = rand() % GAME_SIZE;
+	}
+	return newLocation;
 }
 
 float getDistance(Location loc1, Location loc2)

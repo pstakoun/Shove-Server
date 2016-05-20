@@ -8,6 +8,8 @@
 
 #include "server.h"
 
+const Location center = { GAME_SIZE / 2, GAME_SIZE / 2 };
+
 struct timespec startTime;
 
 int main(int argc, char **argv)
@@ -71,7 +73,7 @@ void handleInput(char *input)
 	memset(displayName, '\0', sizeof displayName);
 	Location touch = { NAN, NAN };
 	int touched = 1;
-	long touchTime = timeFrom(startTime);
+	long currentTime = timeFrom(startTime);
 
 	char *ptr;
 	ptr = strtok(input, " ");
@@ -99,29 +101,14 @@ void handleInput(char *input)
 		ptr = strtok(NULL, " ");
 	}
 
-	printf("Touch: %s %f %f %lu\n", displayName, touch.x, touch.y, touchTime);
+	printf("Touch: %s %f %f %lu\n", displayName, touch.x, touch.y, currentTime);
 
 	Player *foundPlayer = getPlayer(displayName);
 	if (foundPlayer == NULL) {
 		Player newPlayer;
 		strcpy(newPlayer.displayName, displayName);
-		Location newLocation = { rand() % GAME_SIZE, rand() % GAME_SIZE };
-		Location center = { GAME_SIZE / 2, GAME_SIZE / 2 };
-		while (getDistance(newLocation, center) > GAME_SIZE / 2) {
-			newLocation.x = rand() % GAME_SIZE;
-			newLocation.y = rand() % GAME_SIZE;
-		}
-		newPlayer.location = newLocation;
-		if (touched) {
-			newPlayer.touch = touch;
-		} else {
-			newPlayer.touch = newLocation;
-		}
-		newPlayer.touchTime = touchTime;
-		newPlayer.lastMoveTime = 0;
-		Location emptyLocation = { NAN, NAN };
-		newPlayer.collisionTarget = emptyLocation;
-		newPlayer.collisionTime = NAN;
+		resetPlayer(&newPlayer, currentTime);
+
 		// Assign random color to player
 		int tempColor = rand() % NUM_COLORS;
 		newPlayer.color = (tempColor + 1) % NUM_COLORS;
@@ -129,10 +116,11 @@ void handleInput(char *input)
 			newPlayer.color = (newPlayer.color + 1) % NUM_COLORS;
 		}
 		usedColors[newPlayer.color] = 1;
+
 		// Add player to linked list
 		addPlayer(newPlayer);
 	} else {
-		foundPlayer->touchTime = touchTime;
+		foundPlayer->touchTime = currentTime;
 		if (touched) {
 			foundPlayer->touch = touch;
 		} else {
