@@ -4,6 +4,7 @@
 
 typedef struct Players
 {
+	int id;
 	char displayName[16];
 	Location location;
 	Location touch;

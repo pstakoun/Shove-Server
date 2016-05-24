@@ -35,7 +35,7 @@ void resetPlayer(Player *player, long currentTime)
 
 void addPlayer(Player player)
 {
-	printf("Adding player: %s %f %f %f %f %lu\n", player.displayName, player.location.x, player.location.y, player.touch.x, player.touch.y, player.touchTime);
+	printf("Adding player: %i %s %f %f %f %f %lu\n", player.id, player.displayName, player.location.x, player.location.y, player.touch.x, player.touch.y, player.touchTime);
 
 	if (countPlayers() == 0) {
 		initPlayerList(player);
@@ -58,7 +58,7 @@ void removePlayer(Player player)
 	Node *previous = NULL;
 
 	while(current != NULL) {
-		if (strcmp(player.displayName, current->value.displayName) == 0) {
+		if (player.id == current->value.id) {
 			usedColors[current->value.color] = 0;
 			if (current == head) {
 				head = head->next;
@@ -73,11 +73,11 @@ void removePlayer(Player player)
 	}
 }
 
-Player *getPlayer(char *displayName)
+Player *getPlayer(int id)
 {
 	Node *current = head;
 	while (current != NULL) {
-		if (strcmp(displayName, current->value.displayName) == 0) {
+		if (id == current->value.id) {
 			return &current->value;
 		}
 		current = current->next;
@@ -91,7 +91,7 @@ void updatePlayerLocations(long currentTime)
 	while (current != NULL) {
 		if (currentTime - current->value.touchTime > 1000) {
 			removePlayer(current->value);
-		} else if (getDistance(current->value.location, center) > GAME_SIZE / 2 + PLAYER_RADIUS) {
+		} else if (getDistance(current->value.location, center) > GAME_SIZE / 2 - PLAYER_RADIUS) {
 			resetPlayer(&(current->value), currentTime);
 		}
 		current = current->next;
@@ -122,7 +122,7 @@ void updatePlayerLocations(long currentTime)
 
 		Node *other = head;
 		while (other != NULL) {
-			if (current->value.displayName != other->value.displayName &&
+			if (current->value.id != other->value.id &&
 			getDistance(current->value.location, other->value.location) < PLAYER_RADIUS * 2 &&
 			(isnan(current->value.collisionTime) || (!isnan(current->value.collisionTime) && currentTime - current->value.collisionTime > MOVE_DELAY * 3))) {
 				handleCollision(&(current->value), &(other->value));
@@ -137,7 +137,7 @@ void updatePlayerLocations(long currentTime)
 
 void handleCollision(Player *p1, Player *p2)
 {
-	printf("Collision: %s %s\n", p1->displayName, p2->displayName);
+	printf("Collision: %i %s %i %s\n", p1->id, p1->displayName, p2->id, p2->displayName);
 	float p1CollisionDist;
 	float p2CollisionDist;
 	if (p2->touch.x != p2->location.x && p2->touch.y != p2->location.y) {
@@ -186,7 +186,7 @@ void printPlayers()
 	printf("Printing player list:\n");
 	Node *current = head;
 	while (current != NULL) {
-		printf("%s %f %f %f %f %lu\n", current->value.displayName, current->value.location.x, current->value.location.y, current->value.touch.x, current->value.touch.y, current->value.touchTime);
+		printf("%i %s %f %f %f %f %lu\n", current->value.id, current->value.displayName, current->value.location.x, current->value.location.y, current->value.touch.x, current->value.touch.y, current->value.touchTime);
 		current = current->next;
 	}
 }
@@ -194,7 +194,7 @@ void printPlayers()
 Location randomLocation()
 {
 	Location newLocation = { rand() % GAME_SIZE, rand() % GAME_SIZE };
-	while (getDistance(newLocation, center) > GAME_SIZE / 2) {
+	while (getDistance(newLocation, center) > GAME_SIZE / 2 - PLAYER_RADIUS * 2) {
 		newLocation.x = rand() % GAME_SIZE;
 		newLocation.y = rand() % GAME_SIZE;
 	}

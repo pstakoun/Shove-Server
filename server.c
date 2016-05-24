@@ -69,6 +69,7 @@ int main(int argc, char **argv)
 
 void handleInput(char *input)
 {
+	int id = -1;
 	char displayName[16];
 	memset(displayName, '\0', sizeof displayName);
 	Location touch = { NAN, NAN };
@@ -79,7 +80,9 @@ void handleInput(char *input)
 	ptr = strtok(input, " ");
 	while (ptr != NULL)
 	{
-		if (strlen(displayName) == 0) {
+		if (id == -1) {
+			id = atoi(ptr);
+		} else if (strlen(displayName) == 0) {
 			strcpy(displayName, ptr);
 		} else if (isnan(touch.x)) {
 			if (strcmp(ptr, "null") == 0) {
@@ -101,11 +104,14 @@ void handleInput(char *input)
 		ptr = strtok(NULL, " ");
 	}
 
-	printf("Touch: %s %f %f %lu\n", displayName, touch.x, touch.y, currentTime);
+	printf("Touch: %i %s %f %f %lu\n", id, displayName, touch.x, touch.y, currentTime);
 
-	Player *foundPlayer = getPlayer(displayName);
+	Player *foundPlayer = getPlayer(id);
 	if (foundPlayer == NULL) {
 		Player newPlayer;
+
+		newPlayer.id = id;
+
 		strcpy(newPlayer.displayName, displayName);
 		resetPlayer(&newPlayer, currentTime);
 

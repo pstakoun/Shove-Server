@@ -17,7 +17,7 @@ void addPlayer(Player player);
 
 void removePlayer(Player player);
 
-Player *getPlayer(char *displayName);
+Player *getPlayer(int id);
 
 void updatePlayerLocations();
 
