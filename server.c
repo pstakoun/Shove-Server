@@ -22,6 +22,7 @@ int main(int argc, char **argv)
 	socklen_t addressSize;
 	struct sockaddr_storage storage;
 
+	// Create socket
 	int udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
 
 	printf("udpSocket = %i\n", udpSocket);
@@ -30,14 +31,18 @@ int main(int argc, char **argv)
 	address.sin_port = htons(port);
 	address.sin_addr.s_addr = htonl(INADDR_ANY);
 
+	// Clear memory for address
 	memset(address.sin_zero, '\0', sizeof address.sin_zero);
 
+	// Bind socket
 	bind(udpSocket, (struct sockaddr *) &address, sizeof(address));
 
 	addressSize = sizeof storage;
 
-	srand(time(NULL)); // Initialize random number generator
+	// Initialize random number generator
+	srand(time(NULL));
 
+	// Store start time
 	clock_gettime(CLOCK_MONOTONIC, &startTime);
 
 	printf("Server started on port %i\n", port);
@@ -54,8 +59,10 @@ int main(int argc, char **argv)
 
 		printf("Input: %s\nnumBytes = %i\n", buffer, numBytes);
 
+		// Update Player
 		handleInput(buffer);
 
+		// Update Players and store output
 		numBytes = getOutput(buffer, sizeof buffer);
 
 		printf("Output: %s\nnumBytes = %i\n", buffer, numBytes);
@@ -69,6 +76,7 @@ int main(int argc, char **argv)
 
 void handleInput(char *input)
 {
+	// Initialize properties
 	int id = -1;
 	char displayName[16];
 	memset(displayName, '\0', sizeof displayName);
@@ -76,15 +84,19 @@ void handleInput(char *input)
 	int touched = 1;
 	long currentTime = timeFrom(startTime);
 
+	// Get tokens from data
 	char *ptr;
 	ptr = strtok(input, " ");
 	while (ptr != NULL)
 	{
 		if (id == -1) {
+			// Get id
 			id = atoi(ptr);
 		} else if (strlen(displayName) == 0) {
+			// Get display name
 			strcpy(displayName, ptr);
 		} else if (isnan(touch.x)) {
+			// Get x coordinate of touch
 			if (strcmp(ptr, "null") == 0) {
 				touch.x = 0;
 				touched = 0;
@@ -93,6 +105,7 @@ void handleInput(char *input)
 				touch.x = atof(ptr);
 			}
 		} else if (isnan(touch.y)) {
+			// Get y coordinate of touch
 			if (strcmp(ptr, "null") == 0) {
 				touch.y = 0;
 				touched = 0;
@@ -104,14 +117,19 @@ void handleInput(char *input)
 		ptr = strtok(NULL, " ");
 	}
 
+	// Log received data
 	printf("Touch: %i %s %f %f %lu\n", id, displayName, touch.x, touch.y, currentTime);
 
+	// Attempt to find Player by id
 	Player *foundPlayer = getPlayer(id);
 	if (foundPlayer == NULL) {
+		// Create new Player if none found
 		Player newPlayer;
 
+		// Set Player id
 		newPlayer.id = id;
 
+		// Set Player displayname
 		strcpy(newPlayer.displayName, displayName);
 		resetPlayer(&newPlayer, currentTime);
 
@@ -121,12 +139,15 @@ void handleInput(char *input)
 		while (usedColors[newPlayer.color] && newPlayer.color != tempColor) {
 			newPlayer.color = (newPlayer.color + 1) % NUM_COLORS;
 		}
-		usedColors[newPlayer.color] = 1;
+		usedColors[newPlayer.color]++;
 
 		// Add player to linked list
 		addPlayer(newPlayer);
 	} else {
+		// Update Player touch time
 		foundPlayer->touchTime = currentTime;
+
+		// Update Player touch location
 		if (touched) {
 			foundPlayer->touch = touch;
 		} else {
@@ -134,6 +155,7 @@ void handleInput(char *input)
 		}
 	}
 	
+	// Log current Players on server
 	printPlayers();
 }
 
@@ -141,13 +163,16 @@ int getOutput(char *output, size_t outputSize)
 {
 	memset(output, '\0', outputSize);
 
+	// Update Player locations
 	updatePlayerLocations(timeFrom(startTime));
 
+	// Get Player data as string
 	int size = playersToString(output);
 
 	return size;
 }
 
+// Get time from the given time in milliseconds
 long timeFrom(struct timespec start)
 {
 	struct timespec tt;
