@@ -78,7 +78,7 @@ void handleInput(char *input)
 {
 	// Initialize properties
 	int id = -1;
-	char displayName[16];
+	char displayName[17];
 	memset(displayName, '\0', sizeof displayName);
 	Location touch = { NAN, NAN };
 	int touched = 1;
